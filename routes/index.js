@@ -28,6 +28,17 @@ router.post('/newparty', function(req, res, next) {
   });
 });
 
+//vérifier si la party existe bien lorsque l'invité la rentre
+router.get('/findparty', (req, res) => {
+  Party.findOne({name:req.query.name})
+  .then(data => {
+    if (data === null) {
+    res.json({result: false, error: 'Party not found'})
+    } else {
+      res.json({result: true, message: 'welcome to the party!'});
+    }
+  })})
+  
 
 
 module.exports = router;
