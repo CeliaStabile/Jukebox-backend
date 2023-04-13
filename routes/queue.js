@@ -37,7 +37,18 @@ router.put('/new', function(req, res, next) {
   });
 
 
-// route get pour récupérer l'ensemble du queueItem en fonction du nom de la soirée  
+// route get pour récupérer l'ensemble du queueItem en fonction du nom de la soirée
+router.get('/:name', function(req, res, next) {
+  Party.findOne({name: req.params.name}, 'queueItems')
+    .then(result => {
+      res.json({ success: true, queueItems: result.queueItems });
+    })
+    .catch(error => {
+      console.error(error);
+      res.json({ success: false, message: 'problème' });
+    });
+});
+
 
 
 
