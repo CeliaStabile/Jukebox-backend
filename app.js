@@ -6,6 +6,7 @@ require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 var suggestionsRouter = require('./routes/suggestions');
+var queueRouter = require('./routes/queue');
 
 var app = express();
 
@@ -20,5 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/suggestions', suggestionsRouter);
+app.use('/queue', queueRouter);
+
 
 module.exports = app;
