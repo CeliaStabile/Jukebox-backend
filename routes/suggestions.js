@@ -65,12 +65,12 @@ router.put('/new', function(req, res, next) {
       
   //pour supprimer une suggestion si envoyer dans la playlist queue
   router.delete('/:name', function(req, res, next) {
-    Party.updateOne({ name: req.params.name }, { $pull: { suggestions: { uri: req.body.uri } } })
+    Party.updateOne({ name: req.params.name }, { $set: { queueItems: [] } })
       .then(data => {
-        res.json({ result: true, message: 'Suggestion bien supprimée de la liste' });
+        res.json({ result: true, message: 'queueItem vidé' });
       })
       .catch(error => {
-        res.json({ result: false, error: 'soit la party non repertoriée ou uri non connu' });
+        res.json({ result: false, error: 'erreur' });
       });
   });
   
