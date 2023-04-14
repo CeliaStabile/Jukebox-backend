@@ -24,7 +24,10 @@ const nowPlayingSchema = mongoose.Schema({
 
 const partySchema = mongoose.Schema({
     name: String,
- //sous document à faire en base de donnée
+    nowPlaying: {
+        type: nowPlayingSchema,
+        default: {}
+      },
     queueItems: [queueItemsSchema],
     suggestions: [suggestionsSchema],
   });
