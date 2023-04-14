@@ -6,19 +6,12 @@ const Party = require('../models/parties');
 
 //pour avoir la liste de la liste de suggestion
  router.get('/:name', function(req, res, next){
-    Party.findOne({ name : req.body.name})
+    Party.findOne({ name : req.params.name})
     .then(data => {
-        const tab = data.suggestions
-        console.log('data', data)
-        res.json({ success: true, liste: tab })
-    }
-        /*data => {
-        let suggestions =[];
-        for (const e of data) {
-            tweets.push(e);
-            suggestions.push(data);
-            res.json({ tweets });*/
-    )})
+        const tab = data.suggestions;
+        //console.log('data', tab)
+        res.json({ success: true, suggestions: tab })
+    })})
         
 
 
