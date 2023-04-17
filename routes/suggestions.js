@@ -44,18 +44,62 @@ router.put('/new', function(req, res, next) {
   
   // les invités peuvent envoyés des likes et increment le compteur ( comme dans hackatweet)    
   
+  // router.put('/like/:name/:uri', (req, res) => {
+  //   Party.updateOne({ name: req.params.name, "suggestions.uri": req.params.uri }, { $inc: { "suggestions.$.likeCount": 1 } })
+  //     .then(data => {
+  //       res.json({ result: true, message: 'A voté' });
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //       res.status(500).json({ error: 'Probleme, soit uri ou name ? ' });
+  //     });
+  // });
   router.put('/like/:name/:uri', (req, res) => {
-    Party.updateOne({ name: req.params.name, "suggestions.uri": req.params.uri }, { $inc: { "suggestions.$.likeCount": 1 } })
-      .then(data => {
-        res.json({ result: true, message: 'A voté' });
-      })
-      .catch(error => {
-        console.log(error);
-        res.status(500).json({ error: 'Probleme, soit uri ou name ? ' });
+    Party.findOneAndUpdate(
+      { name: req.params.name, "suggestions.uri": req.params.uri },
+      { $inc: { "suggestions.$.likeCount": 1 } },
+      { new: true } // Return the updated document
+    )
+    .then(updatedParty => {
+      // Find the updated suggestion
+      const updatedSuggestion = updatedParty.suggestions.find(s => s.uri === req.params.uri);
+  
+      res.json({
+        result: true,
+        message: 'A voté',
+        likeCount: updatedSuggestion.likeCount
       });
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ error: 'Problème lors de la mise à jour des likes' });
+    });
   });
   
       
+  router.put('/dislike/:name/:uri', (req, res) => {
+    Party.findOneAndUpdate(
+      { name: req.params.name, "suggestions.uri": req.params.uri },
+      { $inc: { "suggestions.$.likeCount": -1 } },
+      { new: true } // Return the updated document
+    )
+    .then(updatedParty => {
+      // Find the updated suggestion
+      const updatedSuggestion = updatedParty.suggestions.find(s => s.uri === req.params.uri);
+  
+      res.json({
+        result: true,
+        message: 'a supprimé son vote',
+        likeCount: updatedSuggestion.likeCount
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ error: 'Problème lors de la mise à jour des likes' });
+    });
+  });
+  
+
   //pour supprimer une suggestion si envoyer dans la playlist queue
   router.delete('/:name', function(req, res, next) {
     Party.updateOne({ name: req.params.name }, { $set: { queueItems: [] } })
