@@ -53,21 +53,16 @@ router.put('/new', function(req, res, next) {
 Party.findOne({name: req.body.name, "suggestions.uri": newSuggestion.uri
 }).then(uri => {
   if (uri === null){
-  res.json({ result: false, error: 'Party inexistante ' });
-      return;
-    }
-  
-      Party.updateOne({name: req.body.name}, { $push: { suggestions: newSuggestion }})
-      .then(result => {
-        res.json({ success: true, message: 'Suggestion bien ajouté à liste !' });
-      })
-      .catch(error => {
-        console.error(error);
-        res.json({ success: false, message: 'Chanson déjà proposée, ajouter votre vote !' });
-      });
-    });
+    Party.updateOne({name: req.body.name}, { $push: { suggestions: newSuggestion }})
+    .then(result => {
+      res.json({ success: true, message: 'Suggestion bien ajouté à liste !' });
+    })
 
-})
+  } else {
+    res.json({ result: false, error: 'Chanson déjà proposée, ajouter votre vote !' });
+    return;
+
+  } }) })
 
    
   
