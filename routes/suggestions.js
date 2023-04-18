@@ -13,12 +13,7 @@ const Party = require('../models/parties');
         res.json({ success: true, suggestions: tab })
     })})
         
-
-
-
-
-//pour ajouter une nouvelle suggestion dans le tableau Suggestions de la database
-// ajout condition si uri chanson déjà en db
+/*
 router.put('/new', function(req, res, next) {
     const newSuggestion = {
       title: req.body.title,
@@ -37,23 +32,49 @@ router.put('/new', function(req, res, next) {
     });
   });
   
+   
+*/
+
+
+
+
+
+//pour ajouter une nouvelle suggestion dans le tableau Suggestions de la database
+// ajout condition si uri chanson déjà en db
+router.put('/new', function(req, res, next) {
+    const newSuggestion = {
+      title: req.body.title,
+      artist: req.body.artist,
+      url_image: req.body.url_image,
+      uri: req.body.uri,
+      likeCount: 0
+    };
+
+Party.findOne({name: req.body.name, "suggestions.uri": newSuggestion.uri
+}).then(uri => {
+  if (uri === null){
+  res.json({ result: false, error: 'Party inexistante ' });
+      return;
+    }
+  
+      Party.updateOne({name: req.body.name}, { $push: { suggestions: newSuggestion }})
+      .then(result => {
+        res.json({ success: true, message: 'Suggestion bien ajouté à liste !' });
+      })
+      .catch(error => {
+        console.error(error);
+        res.json({ success: false, message: 'Chanson déjà proposée, ajouter votre vote !' });
+      });
+    });
+
+})
+
+   
+  
   
   
   
           
-  
-  // les invités peuvent envoyés des likes et increment le compteur ( comme dans hackatweet)    
-  
-  // router.put('/like/:name/:uri', (req, res) => {
-  //   Party.updateOne({ name: req.params.name, "suggestions.uri": req.params.uri }, { $inc: { "suggestions.$.likeCount": 1 } })
-  //     .then(data => {
-  //       res.json({ result: true, message: 'A voté' });
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //       res.status(500).json({ error: 'Probleme, soit uri ou name ? ' });
-  //     });
-  // });
   router.put('/like/:name/:uri', (req, res) => {
     Party.findOneAndUpdate(
       { name: req.params.name, "suggestions.uri": req.params.uri },
@@ -102,15 +123,7 @@ router.put('/new', function(req, res, next) {
   
   
   //pour supprimer une suggestion si envoyer dans la playlist queue à revoir le chemin ???
-  router.delete('/:name/:uri', function(req, res, next) {
-    Party.updateOne({ name: req.params.name }, { $pull: { suggestions: { uri: req.params.uri } } })
-      .then(data => {
-        res.json({ result: true, message: 'Chanson bien envoyée' });
-      })
-      .catch(error => {
-        res.json({ result: false, error: 'erreur' });
-      });
-  });
+ 
 
   router.put('/:name/:uri', function(req, res, next) {
     Party.updateOne(
