@@ -18,7 +18,7 @@ const Party = require('../models/parties');
 
 
 //pour ajouter une nouvelle suggestion dans le tableau Suggestions de la database
-
+// ajout condition si uri chanson déjà en db
 router.put('/new', function(req, res, next) {
     const newSuggestion = {
       title: req.body.title,
@@ -47,7 +47,7 @@ router.put('/new', function(req, res, next) {
   router.put('/like/:name/:uri', (req, res) => {
     Party.updateOne({ name: req.params.name, "suggestions.uri": req.params.uri }, { $inc: { "suggestions.$.likeCount": 1 } })
       .then(data => {
-        res.json({ result: true, message: 'A voté' });
+        res.json({ result: true, message: 'A Voté' });
       })
       .catch(error => {
         console.log(error);
@@ -55,16 +55,30 @@ router.put('/new', function(req, res, next) {
       });
   });
   
-      
-  //pour supprimer une suggestion si envoyer dans la playlist queue
-  router.delete('/:name', function(req, res, next) {
-    Party.updateOne({ name: req.params.name }, { $set: { queueItems: [] } })
+  
+  
+  //pour supprimer une suggestion si envoyer dans la playlist queue à revoir le chemin ???
+  router.delete('/:name/:uri', function(req, res, next) {
+    Party.updateOne({ name: req.params.name }, { $pull: { suggestions: { uri: req.params.uri } } })
       .then(data => {
-        res.json({ result: true, message: 'queueItem vidé' });
+        res.json({ result: true, message: 'Chanson bien envoyée' });
       })
       .catch(error => {
         res.json({ result: false, error: 'erreur' });
       });
+  });
+
+  router.put('/:name/:uri', function(req, res, next) {
+    Party.updateOne(
+      { name: req.params.name },
+      { $pull: { suggestions: { uri: req.params.uri } } }
+    )
+    .then(data => {
+      res.json({ result: true, message: 'Suggestion supprimée avec succès' });
+    })
+    .catch(error => {
+      res.json({ result: false, error: 'Erreur lors de la suppression de la suggestion' });
+    });
   });
   
 
